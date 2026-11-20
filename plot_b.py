@@ -118,8 +118,10 @@ def plot_times(rows):
         if g not in grids:
             grids.append(g)
 
-    fig, ax = plt.subplots(figsize=(11, 4.8))
-    x, ticks, labels, centers = 0.0, [], [], []
+    nbars = len(rows)
+    gap = 1.5  # espacio entre grupos (en anchos de barra)
+    fig, ax = plt.subplots(figsize=(max(11, 0.45 * nbars + 3), 5.4))
+    x, ticks, labels, centers, bounds = 0.0, [], [], [], []
     for g in grids:
         rs = [r for r in rows if (r["pr"], r["pc"]) == g]
         xs = x + np.arange(len(rs))
@@ -131,15 +133,21 @@ def plot_times(rows):
                linewidth=2, label="Comunicación" if g == grids[0] else None, zorder=3)
         ticks += list(xs)
         labels += [f"({r['myrow']},{r['mycol']})" for r in rs]
-        centers.append((xs.mean(), f"{g[0]}×{g[1]}  ({rs[0]['t_wall'] * 1e3:.0f} ms)"))
-        x = xs[-1] + 1.8
+        centers.append((xs.mean(), f"{g[0]}×{g[1]}\n{rs[0]['t_wall'] * 1e3:.0f} ms"))
+        bounds.append(xs[-1] + (gap + 1) / 2)
+        x = xs[-1] + gap + 1
 
+    ax.set_xlim(-0.8, ticks[-1] + 0.8)
     ax.set_xticks(ticks)
-    ax.set_xticklabels(labels, fontsize=10)
+    ax.set_xticklabels(labels, fontsize=9.5, rotation=90)
+    # Separadores tenues entre grids.
+    for xb in bounds[:-1]:
+        ax.axvline(xb, color=GRID, linewidth=1, zorder=1)
+    # Nombre del grid y tiempo total, bajo las etiquetas (fila, col) verticales.
     for cx, txt in centers:
         ax.annotate(txt, (cx, 0), xycoords=("data", "axes fraction"),
-                    xytext=(0, -36), textcoords="offset points", ha="center",
-                    fontsize=11, color="#0b0b0b")
+                    xytext=(0, -46), textcoords="offset points", ha="center", va="top",
+                    fontsize=11, color="#0b0b0b", linespacing=1.3)
     ax.set_ylabel("Tiempo por proceso [ms]", fontsize=12)
     ax.grid(True, axis="y", color=GRID, linewidth=0.8)
     ax.set_axisbelow(True)
@@ -148,12 +156,14 @@ def plot_times(rows):
     for s in ("left", "bottom"):
         ax.spines[s].set_color(INK)
     ax.tick_params(colors=INK, labelsize=11)
-    ax.legend(frameon=False, fontsize=11, loc="upper left")
+    # Leyenda arriba, fuera del area de las barras.
+    ax.legend(frameon=False, fontsize=11, loc="lower left", ncol=2,
+              bbox_to_anchor=(0, 1.0), borderaxespad=0.2, handlelength=1.2)
     r0 = rows[0]
     ax.set_title(f"LU distribuida, $N={r0['N']}$, $b={r0['b']}$, T={r0['T']} "
                  f"({LABEL}, mediana de {r0['reps']} corridas). "
-                 "Proceso (fila, col); grid (tiempo total)",
-                 fontsize=12.5, loc="left")
+                 "Barras: proceso (fila, col); abajo: grid y tiempo total",
+                 fontsize=12.5, loc="left", pad=30)
     fig.tight_layout()
     FIG.mkdir(exist_ok=True)
     name = "b_times" if LABEL == "local" else f"b_times_{LABEL}"
