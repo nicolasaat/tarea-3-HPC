@@ -1,0 +1,11 @@
+\begin{tabular}{rrrlrr}
+\toprule
+$N$ & $b$ & $N/b$ & Grids $p_r \times p_c$ & $\frac{\|LU_{\mathrm{dist}} - LU_{\mathrm{serial}}\|_F}{\|LU_{\mathrm{serial}}\|_F}$ & $\frac{\|A - LU\|_F}{\|A\|_F}$ \\
+\midrule
+2048 & 1024 & 2 & 1$\times$1, 1$\times$2, 2$\times$1, 2$\times$2, 2$\times$4, 4$\times$2 & 0 & $1.6 \times 10^{-16}$ \\
+2048 & 256 & 8 & 1$\times$1, 1$\times$2, 2$\times$1, 2$\times$2, 2$\times$4, 4$\times$2 & 0 & $1.8 \times 10^{-16}$ \\
+2560 & 512 & 5 & 1$\times$1, 1$\times$2, 2$\times$1, 2$\times$2, 2$\times$4, 4$\times$2 & 0 & $1.6 \times 10^{-16}$ \\
+2560 & 128 & 20 & 1$\times$1, 1$\times$2, 2$\times$1, 2$\times$2, 2$\times$4, 4$\times$2 & 0 & $2.1 \times 10^{-16}$ \\
+2048 & 2048 & 1 & 1$\times$1, 1$\times$2, 2$\times$1, 2$\times$2, 2$\times$4, 4$\times$2 & 0 & $1.8 \times 10^{-16}$ \\
+\bottomrule
+\end{tabular}

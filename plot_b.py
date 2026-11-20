@@ -4,9 +4,12 @@ Lee results/b_check.csv y results/b_times.csv (generados por run_b.sh) y escribe
   results/b_check_summary.csv/.tex  verificacion contra lu_serial.py
   results/b_times_summary.csv/.tex  computo y comunicacion por proceso (mediana)
   figures/b_times.png/.pdf          barras apiladas computo/comunicacion por proceso
-Uso: python3 plot_b.py
+Uso: python3 plot_b.py                                   (resultados locales)
+     python3 plot_b.py --res results/cluster --label cluster
+     (en ese caso la figura se guarda como figures/b_times_cluster.png/.pdf)
 """
 
+import argparse
 import csv
 from collections import defaultdict
 from pathlib import Path
@@ -19,6 +22,7 @@ COMM = "#eb6834"
 INK = "#52514e"
 GRID = "#e4e3df"
 RES, FIG = Path("results"), Path("figures")
+LABEL = "local"
 
 
 def read(path):
@@ -147,16 +151,24 @@ def plot_times(rows):
     ax.legend(frameon=False, fontsize=11, loc="upper left")
     r0 = rows[0]
     ax.set_title(f"LU distribuida, $N={r0['N']}$, $b={r0['b']}$, T={r0['T']} "
-                 f"(local, mediana de {r0['reps']} corridas). "
+                 f"({LABEL}, mediana de {r0['reps']} corridas). "
                  "Proceso (fila, col); grid (tiempo total)",
                  fontsize=12.5, loc="left")
     fig.tight_layout()
     FIG.mkdir(exist_ok=True)
+    name = "b_times" if LABEL == "local" else f"b_times_{LABEL}"
     for ext in ("png", "pdf"):
-        fig.savefig(FIG / f"b_times.{ext}", dpi=200, bbox_inches="tight")
+        fig.savefig(FIG / f"{name}.{ext}", dpi=200, bbox_inches="tight")
 
 
 def main():
+    global RES, LABEL
+    p = argparse.ArgumentParser()
+    p.add_argument("--res", default="results", help="carpeta con b_check.csv y b_times.csv")
+    p.add_argument("--label", default="local", help="'local' o 'cluster' (titulo y nombre de figura)")
+    args = p.parse_args()
+    RES, LABEL = Path(args.res), args.label
+
     check_summary()
     rows = times_summary()
     plot_times(rows)
@@ -164,8 +176,8 @@ def main():
     for r in rows:
         print(f"{r['pr']}x{r['pc']:<3} {r['rank']:>4} {r['t_comp'] * 1e3:9.1f} "
               f"{r['t_comm'] * 1e3:9.1f} {r['t_total'] * 1e3:9.1f}")
-    print("Escrito: results/b_check_summary.{csv,tex}, results/b_times_summary.{csv,tex}, "
-          "figures/b_times.{png,pdf}")
+    print(f"Escrito en {RES}/: b_check_summary.{{csv,tex}}, b_times_summary.{{csv,tex}}; "
+          f"figura en {FIG}/")
 
 
 if __name__ == "__main__":
