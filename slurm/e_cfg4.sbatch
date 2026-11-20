@@ -2,6 +2,7 @@
 #SBATCH --qos=hpc-iic3533
 #SBATCH --partition=hpc-iic3533
 #SBATCH --account=default-account
+#SBATCH --comment="Tarea 3 IIC3533 inciso e: LU distribuida, configuracion 4 (grid 2x4, 2 nodos x 4 procesos)"
 #SBATCH --job-name=e_cfg4
 #SBATCH --nodes=2
 #SBATCH --ntasks=8

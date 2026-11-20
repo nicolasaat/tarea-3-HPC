@@ -2,6 +2,7 @@
 #SBATCH --qos=hpc-iic3533
 #SBATCH --partition=hpc-iic3533
 #SBATCH --account=default-account
+#SBATCH --comment="Tarea 3 IIC3533: prueba del entorno (conda, mpi4py) y de lu_distributed.py en el cluster"
 #SBATCH --job-name=test_env
 #SBATCH --nodes=1
 #SBATCH --ntasks=4
